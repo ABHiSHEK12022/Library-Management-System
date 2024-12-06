@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        header {
+            background: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .nav-buttons button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 10px;
+            width: 150px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .nav-buttons button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .sidebar {
+            background: #343a40;
+            color: #fff;
+            padding: 20px;
+            width: 200px;
+            float: left; /* Align sidebar to the left */
+            display: none; /* Initially hidden */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar button {
+            background: #343a40;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .sidebar button:hover {
+            background: #495057;
+            transform: scale(1.05);
+        }
+
+        .content {
+            padding: 20px;
+            margin-left: 220px; /* To avoid overlap with sidebar */
+        }
+
+        .content h2 {
+            color: #007bff;
+        }
+
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.8); /* Black w/ opacity */
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .modal-content input[type="text"],
+        .modal-content input[type="date"],
+        .modal-content input[type="number"],
+        .modal-content select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal-content button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .modal-content button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Library Management System</h1>
+    </header>
+
+    <div class="nav-buttons">
+        <button id="maintenanceButton">Maintenance</button>
+        <button id="reportTransactionButton">Transaction</button>
+    </div>
+    
+    <div class="sidebar" id="maintenanceSidebar">
+        <h3>Options</h3>
+        <button id="membershipOption">Membership</button>
+        <button id="booksMoviesOption">Books/Movies</button>
+        <button id="userManagementOption">User  Management</button>
+        <button id="backButton">Back</button>
+    </div>
+    
+    <div class="content" id="contentArea">
+        <h2>Welcome to the Library Management System</h2>
+        <p>Select an option from the top navigation to get started.</p>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div class="modal" id="addMemberModal">
+        <div class="modal-content">
+            <h2>Add Member</h2>
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" required>
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" required>
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" required>
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" required>
+            <div class="radio-group">
+                <label>Duration:</label>
+                <label><input type="radio" name="duration" value="6 months" checked> 6 Months</label>
+                <label><input type="radio" name="duration" value="1 year"> 1 Year</label>
+                <label><input type="radio" name="duration" value="2 years"> 2 Years</label>
+            </div>
+            <button id="clearButton">Clear</button>
+            <button id="saveButton">Submit</button>
+            <button id="backModalButton">Back</button>
+            <div id="membershipError" class="error"></div>
+        </div>
+    </div>
+    <div class="modal" id="updateMemberModal">
+        <div class="modal-content">
+            <h2>Update Member</h2>
+            <label for="membershipNumber">Membership Number:</label>
+            <input type="number" id="membershipNumber" required>
+            <label for="updateStartDate">Start Date:</label>
+            <input type="date" id="updateStartDate" required>
+            <label for="updateEndDate">End Date :</label>
+            <input type="date" id="updateEndDate" required>
+            <label for="membershipExtension">Membership Extension:</label>
+            <input type=" text" id="membershipExtension">
+            <button id="removeButton">Remove</button>
+            <button id="updateBackButton">Back</button>
+            <button id="updateClearButton">Clear</button>
+        </div>
+    </div>
+
+    <div class="modal" id="addBookMovieModal">
+        <div class="modal-content">
+            <h2>Add Book/Movie</h2>
+            <div class="radio-group">
+                <label><input type="radio" name="itemType" value="book" required> Book</label>
+                <label><input type="radio" name="itemType" value="movie"> Movie</label>
+            </div>
+            <label for="itemName">Name:</label>
+            <input type="text" id="itemName" required>
+            <label for="procurementDate">Date of Procurement:</label>
+            <input type="date" id="procurementDate" required>
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" required>
+            <button id="cancelButton">Cancel</button>
+            <button id="confirmButton">Confirm</button>
+            <button id="backButtonAdd">Back</button>
+        </div>
+    </div>
+
+    <div class="modal" id="updateBookMovieModal">
+        <div class="modal-content">
+            <h2>Update Book/Movie</h2>
+            <label for="updateItemName">Name:</label>
+            <input type="text" id="updateItemName" required>
+            <label for="serialno">Serial Number:</label>
+            <input type="text" id="serialno" required>
+            <label for="status">Status:</label>
+            <input type="text" id="status" required>
+            <label for="date">Date:</label>
+            <input type="date" id="date" required>
+            <button id="updateCancelButton">Cancel</button>
+            <button id="updateConfirmButton">Confirm</button>
+            <button id="updateBackButton">Back</button>
+        </div>
+    </div>
+
+    <div class="modal" id="userManagementModal">
+        <div class="modal-content">
+            <h2>User Management</h2>
+            <div class="radio-group">
+                <label><input type="radio" name="userType" value="existingUser " required> Existing User</label>
+                <label><input type="radio" name="userType" value="newUser "> New User</label>
+            </div>
+            <label for="userName">Name:</label>
+            <input type="text" id="userName" required>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="activeStatus"> Active</label>
+                <label><input type="checkbox" id="adminStatus"> Admin</label>
+            </div>
+            <button id="userCancelButton">Cancel</button>
+            <button id="userConfirmButton">Confirm</button>
+            <button id="userBackButton">Back</button>
+        </div>
+    </div>
+
+
+    <!-- Issue Book Modal -->
+    <div class="modal" id="issueBookModal">
+        <div class="modal-content">
+            <h2>Issue Book</h2>
+            <label for="issueBookTitle">Name of Book:</label>
+            <input type="text" id="issueBookTitle" required>
+            <label for="issueAuthor">Author Name:</label>
+            <input type="text" id="issueAuthor" readonly>
+            <label for="issueDate">Issue Date:</label>
+            <input type="date" id="issueDate" required>
+            <label for="returnDate">Return Date:</label>
+            <input type="date" id="returnDate" required>
+            <label for="remarks">Remarks (optional):</label>
+            <input type="text" id="remarks">
+            <button id="issueConfirmButton">Confirm</button>
+            <button id="issueBackButton">Back</button>
+            <div id="issueError" class="error"></div>
+        </div>
+    </div>
+
+    <!-- Return Book Modal -->
+    <div class="modal" id="returnBookModal">
+        <div class="modal-content">
+            <h2>Return Book</h2>
+            <label for="returnBookTitle">Name of Book:</label>
+            <input type="text" id="returnBookTitle" required>
+            <label for="returnAuthor">Author Name:</label>
+            <input type="text" id="returnAuthor" readonly>
+            <label for="serialNo">Serial No:</label>
+            <input type="text" id="serialNo" required>
+            <label for="issueDateReturn">Issue Date:</label>
+            <input type="date" id="issueDateReturn" readonly>
+            <label for="returnDateReturn">Return Date:</label>
+            <input type="date" id="returnDateReturn" required>
+            <button id="returnConfirmButton">Confirm</button>
+            <button id ="returnBackButton">Back</button>
+            <div id="returnError" class="error"></div>
+        </div>
+    </div>
+
+    <!-- Pay Fine Modal -->
+    <div class="modal" id="payFineModal">
+        <div class="modal-content">
+            <h2>Pay Fine</h2>
+            <label for="fineMemberId">Member ID:</label>
+            <input type="text" id="fineMemberId" required>
+            <label for="fineAmount">Fine Amount:</label>
+            <input type="number" id="fineAmount" required>
+            <label><input type="checkbox" id="finePaid"> Fine Paid</label>
+            <label for="fineRemarks">Remarks (optional):</label>
+            <input type="text" id="fineRemarks">
+            <button id="payFineConfirmButton">Confirm</button>
+            <button id="payFineBackButton">Back</button>
+            <div id="fineError" class="error"></div>
+        </div>
+    </div>
+
+    <!-- User Management Modal -->
+    <div class="modal" id="userManagementModal">
+        <div class="modal-content">
+            <h2>User Management</h2>
+            <div class="radio-group">
+                <label><input type="radio" name="userType" value="existingUser " required> Existing User</label>
+                <label><input type="radio" name="userType" value="newUser " checked> New User</label>
+            </div>
+            <label for="userName">Name:</label>
+            <input type="text" id="userName" required>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="activeStatus"> Active</label>
+                <label><input type="checkbox" id="adminStatus"> Admin</label>
+            </div>
+            <button id="userCancelButton">Cancel</button>
+            <button id="userConfirmButton">Confirm</button>
+            <button id="userBackButton">Back</button>
+            <div id="userManagementError" class="error"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('maintenanceButton').addEventListener('click', function() {
+            document.getElementById('maintenanceSidebar').style.display = 'block';
+            document.getElementById('contentArea').innerHTML = `
+                <h2>Maintenance</h2>
+                <p>You are in the Maintenance section. Select an option from the left sidebar.</p>
+            `;
+        });
+
+        document.getElementById('membershipOption').addEventListener('click', function() {
+            document.getElementById('contentArea').innerHTML = `
+                <h2>Membership</h2>
+                <button id="addMemberButton">Add Member</button>
+                <button id="updateMemberButton">Update Member</button>
+                <p id="membershipMessage"></p>
+            `;
+            addMemberFunctionality();
+            updateMemberFunctionality();
+        });
+
+        function addMemberFunctionality() {
+            document.getElementById('addMemberButton').addEventListener('click', function() {
+                document.getElementById('addMemberModal').style.display = 'block';
+            });
+
+            document.getElementById('backModalButton').addEventListener('click', function() {
+                document.getElementById('addMemberModal').style.display = 'none';
+            });
+
+            document.getElementById('clearButton').addEventListener('click', function() {
+                document.getElementById('firstName').value = '';
+                document.getElementById('lastName').value = '';
+                document.getElementById('startDate').value = '';
+                document.getElementById('endDate').value = '';
+                document.querySelector('input[name="duration"]:checked').checked = false;
+            });
+
+            document.getElementById('saveButton').addEventListener('click', function() {
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const duration = document.querySelector('input[name="duration"]:checked') ? document.querySelector('input[name="duration"]:checked').value : 'Not selected';
+
+                if (firstName && lastName && startDate && endDate) {
+                    const message = Member added: ${firstName} ${lastName}, Duration: ${duration};
+                    document.getElementById('membershipMessage').innerText = message;
+                    document.getElementById('addMemberModal').style.display = ' none';
+                } else {
+                    document.getElementById('membershipError').innerText = 'Please fill in all fields.';
+                }
+            });
+        }
+
+        function updateMemberFunctionality() {
+            document.getElementById('updateMemberButton').addEventListener('click', function() {
+                document.getElementById('updateMemberModal').style.display = 'block';
+            });
+
+            document.getElementById('updateBackButton').addEventListener('click', function() {
+                document.getElementById('updateMemberModal').style.display = 'none';
+            });
+
+            document.getElementById('updateClearButton').addEventListener('click', function() {
+                document.getElementById('membershipNumber').value = '';
+                document.getElementById('updateStartDate').value = '';
+                document.getElementById('updateEndDate').value = '';
+                document.getElementById('membershipExtension').value = '';
+            });
+
+            document.getElementById('removeButton').addEventListener('click', function() {
+                const membershipNumber = document.getElementById('membershipNumber').value;
+                if (membershipNumber) {
+                    document.getElementById('membershipMessage').innerText = Membership Number ${membershipNumber} has been removed.;
+                    document.getElementById('updateMemberModal').style.display = 'none';
+                } else {
+                    document.getElementById('membershipError').innerText = 'Please enter a membership number to remove.';
+                }
+            });
+        }
+
+        document.getElementById('booksMoviesOption').addEventListener('click', function() {
+            document.getElementById('contentArea').innerHTML = `
+                <h2>Books/Movies</h2>
+                <button id="addBookMovieButton">Add Book/Movie</button>
+                <button id="updateBookMovieButton">Update Book/Movie</button>
+                <p id="booksMoviesMessage"></p>
+            `;
+            addBookMovieFunctionality();
+            updateBookMovieFunctionality();
+        });
+
+        function addBookMovieFunctionality() {
+            document.getElementById('addBookMovieButton').addEventListener('click', function() {
+                document.getElementById('addBookMovieModal').style.display = 'block';
+            });
+
+            document.getElementById('backButtonAdd').addEventListener('click', function() {
+                document.getElementById('addBookMovieModal').style.display = 'none';
+            });
+
+            document.getElementById('cancelButton').addEventListener('click', function() {
+                document.getElementById('itemName').value = '';
+                document.getElementById('procurementDate').value = '';
+                document.getElementById('quantity').value = '';
+                document.querySelector('input[name="itemType"]:checked').checked = false;
+            });
+
+            document.getElementById('confirmButton').addEventListener('click', function() {
+                const itemType = document.querySelector('input[name="itemType"]:checked').value;
+                const itemName = document.getElementById('itemName').value;
+                const procurementDate = document.getElementById('procurementDate').value;
+                const quantity = document.getElementById('quantity').value;
+
+                if (itemName && procurementDate && quantity) {
+                    const message = Added ${itemType}: ${itemName}, Date: ${procurementDate}, Quantity: ${quantity};
+                    document.getElementById('booksMoviesMessage').innerText = message;
+                    document.getElementById('addBookMovieModal').style.display = 'none';
+                } else {
+                    document.getElementById('booksMoviesMessage').innerText = 'Please fill in all fields.';
+                }
+            });
+        }
+
+        function updateBookMovieFunctionality() {
+            document.getElementById('updateBookMovieButton').addEventListener('click', function() {
+                document.getElementById('updateBookMovieModal').style.display = 'block';
+            });
+
+            document.getElementById('updateBackButton').addEventListener('click', function() {
+                document.getElementById('updateBookMovieModal').style.display = 'none';
+            });
+
+            document.getElementById('updateCancelButton').addEventListener('click', function() {
+                document.getElementById('updateItemName').value = '';
+                document.getElementById('serialno').value = '';
+                document.getElementById('status').value = '';
+                document.getElementById('date').value = '';
+            });
+
+            document.getElementById('updateConfirmButton').addEventListener('click', function() {
+                const updateItemName = document.getElementById('updateItemName').value;
+                const serialno = document.getElementById('serialno').value;
+                const status = document.getElementById 
+                ('status').value;
+                const date = document.getElementById('date').value;
+
+                if (updateItemName && serialno && status && date) {
+                    const message = Updated Item: ${updateItemName}, Serial Number: ${serialno}, Status: ${status}, Date: ${date};
+                    document.getElementById('booksMoviesMessage').innerText = message;
+                    document.getElementById('updateBookMovieModal').style.display = 'none';
+                } else {
+                    document.getElementById('booksMoviesMessage').innerText = 'Please fill in all fields.';
+                }
+            });
+        }
+
+        document.getElementById('userManagementOption').addEventListener('click', function() {
+            document.getElementById('contentArea').innerHTML = `
+                <h2>User Management</h2>
+                <button id="manageUser Button">Manage Users</button>
+                <p id="userManagementMessage"></p>
+            `;
+            manageUserFunctionality();
+        });
+
+        function manageUserFunctionality() {
+            document.getElementById('manageUser Button').addEventListener('click', function() {
+                document.getElementById('userManagementModal').style.display = 'block';
+            });
+
+            document.getElementById('userBackButton').addEventListener('click', function() {
+                document.getElementById('userManagementModal').style.display = 'none';
+            });
+
+            document.getElementById('userCancelButton').addEventListener('click', function() {
+                document.getElementById('userName').value = '';
+                document.getElementById('activeStatus').checked = false;
+                document.getElementById('adminStatus').checked = false;
+            });
+
+            document.getElementById('userConfirmButton').addEventListener('click', function() {
+                const userType = document.querySelector('input[name="userType"]:checked').value;
+                const userName = document.getElementById('userName').value;
+                const isActive = document.getElementById('activeStatus').checked;
+                const isAdmin = document.getElementById('adminStatus').checked;
+
+                if (userName) {
+                    const message = ${userType === 'newUser  ' ? 'Added' : 'Updated'} User: ${userName}, Status: ${isActive ? 'Active' : 'Inactive'}, Role: ${isAdmin ? 'Admin' : 'User  '};
+                    document.getElementById('userManagementMessage').innerText = message;
+                    document.getElementById('userManagementModal').style.display = 'none';
+                } else {
+                    document.getElementById('userManagementError').innerText = 'Please enter a name.';
+                }
+            });
+        }
+
+        document.getElementById('reportTransactionButton').addEventListener('click', function() {
+            document.getElementById('contentArea').innerHTML = `
+                <h2>Transaction Management</h2>
+                <button id="issueBookButton">Issue Book</button>
+                <button id="returnBookButton">Return Book</button>
+                <button id="payFineButton">Pay Fine</button>
+                <p id="transactionMessage"></p>
+            `;
+            transactionFunctionality();
+        });
+
+        function transactionFunctionality() {
+            document.getElementById('issueBookButton').addEventListener('click', function() {
+                document.getElementById('issueBookModal').style.display = 'block';
+            });
+
+            document.getElementById('returnBookButton').addEventListener('click', function() {
+                document.getElementById('returnBookModal').style.display = 'block';
+            });
+
+            document.getElementById('payFineButton').addEventListener('click', function() {
+                document.getElementById('payFineModal').style.display = 'block';
+            });
+
+            // Issue Book Functionality
+            document.getElementById('issueConfirmButton').addEventListener('click', function() {
+                const bookTitle = document.getElementById('issueBookTitle').value;
+                const issueDate = document.getElementById('issueDate').value;
+                const returnDate = document.getElementById('returnDate').value;
+                const remarks = document.getElementById('remarks').value;
+
+                if (bookTitle && issueDate && returnDate) {
+                    const message = Book "${bookTitle}" has been issued. Issue Date: ${issueDate}, Return Date: ${returnDate}, Remarks: ${remarks};
+                    document.getElementById('issueError').innerText = message;
+                    document.getElementById('issueBookModal').style.display = 'none';
+                } else {
+                    document.getElementById('issueError').innerText = 'Please fill in all fields.';
+                }
+            });
+
+            // Return Book Functionality
+            document.getElementById('returnConfirmButton').addEventListener('click', function() {
+                const returnBookTitle = document.getElementById('returnBookTitle').value;
+                const serialNo = document.getElementById('serialNo').value;
+                const returnDate = document.getElementById('returnDateReturn').value;
+
+                if (returnBookTitle && serialNo && returnDate) {
+                    const message = Book "${returnBookTitle}" has been returned. Serial No: ${serialNo}, Return Date: ${returnDate};
+                    document.getElementById('returnError').innerText = message;
+                    document.getElementById('returnBookModal').style.display = 'none';
+                } else {
+                    document.getElementById('returnError').innerText = 'Please fill in all fields.';
+                }
+            });
+
+            // Pay Fine Functionality
+            document.getElementById('payFineConfirmButton').addEventListener('click', function() {
+                const fineMemberId = document.getElementById('fineMemberId').value;
+                const fineAmount = document.getElementById('fineAmount').value;
+                const finePaid = document.getElementById('finePaid').checked;
+
+                if (fineMemberId && fineAmount) {
+                    if (finePaid) {
+                        const message = Fine of $${fineAmount} has been paid for Member ID: ${fineMemberId}.;
+                        document.getElementById('fineError').innerText = message;
+                        document.getElementById('payFineModal').style.display = 'none';
+                    } else {
+                        document.getElementById('fineError').innerText = 'Please confirm that the fine has been paid.';
+                    }
+                } else {
+                    document.getElementById('fineError').innerText = 'Please fill in all fields.';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
