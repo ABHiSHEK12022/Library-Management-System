@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard </title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        header {
+            background: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .nav-buttons button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 10px;
+            width: 150px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .nav-buttons button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .sidebar {
+            background: #343a40;
+            color: #fff;
+            padding: 20px;
+            width: 200px;
+            float: left; /* Align sidebar to the left */
+            display: none; /* Initially hidden */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar button {
+            background: #343a40;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .sidebar button:hover {
+            background: #495057;
+            transform: scale(1.05);
+        }
+
+        .content {
+            padding: 20px;
+            margin-left: 220px; /* To avoid overlap with sidebar */
+        }
+
+        .content h2 {
+            color: #007bff;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .profile-info, .borrowed-books, .notifications {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .notifications {
+            background: #e2e3e5;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>User Dashboard - Library Management System</h1>
+    </header>
+
+    <div class="nav-buttons">
+        <button id="homeButton">Home</button>
+        <button id="reportsButton">Reports</button>
+        <button id="logoutButton">Log Out</button>
+    </div>
+    
+    <div class="sidebar" id="reportsSidebar">
+        <h3>Available Reports</h3>
+        <button id="masterListBooks">Master List of Books</button>
+        <button id="masterListMovies">Master List of Movies</button>
+        <button id="masterListMemberships">Master List of Memberships</button>
+        <button id="activeIssues">Active Issues</button>
+        <button id="overdueReturns">Overdue Returns</button>
+        <button id="pendingRequests">Pending Issue Requests</button>
+        <button id="backButtonReports">Back</button>
+    </div>
+    
+    <div class="content" id="contentArea">
+        <h2>Welcome to the User Dashboard</h2>
+        <p>Select an option from the top navigation to get started.</p>
+    </div>
+
+    <script>
+        document.getElementById('homeButton').addEventListener('click', function() {
+            document.getElementById('reportsSidebar').style.display = 'none';
+            document.getElementById('contentArea').innerHTML = `
+                <h2>User Home Page</h2>
+                <div class="profile-info">
+                    <h3>User Profile</h3>
+                    <p>Name: abhishek</p>
+                    <p>Email: abhik@example.com</p>
+                    <p>Membership ID: 123456</p>
+                </div>
+                <div class="borrowed-books">
+                    <h3>Borrowed Books</h3>
+                    <ul>
+                        <li>The Great Gatsby - Due: 2024-11-01</li>
+                        <li>1984 - Due: 2024-11-15</li>
+                    </ul>
+                </div>
+                <div class="notifications">
+                    <h3>Notifications</h3>
+                    <p>You have 2 overdue books. Please return them as soon as possible.</p>
+                </div>
+            `;
+        });
+
+        document.getElementById('reportsButton').addEventListener('click', function() {
+            document.getElementById('reportsSidebar').style.display = 'block';
+            document.getElementById('contentArea').innerHTML = `
+                <h2>Reports</h2>
+                <p>Select a report from the sidebar.</p>
+            `;
+        });
+
+        document.getElementById('masterListBooks').addEventListener('click', function() {
+            document.getElementById('contentArea').innerHTML = `
+                <h2>Master List of Books</h2>
+                <p>Display the list of all books here.</p>
+            `;
+        });
+
+        document.getElementById('masterListMovies').addEventListener('click', function() {
+            document.getElementById('contentArea').innerHTML = `
+                <h2>Master List of Movies</h2>
+                <p>Display the list of all movies here.</p>
+            `;
+        });
+
+        document.getElementById('masterListMemberships').addEventListener('click', function() {
+            document.getElementById('contentArea').innerHTML = `
+                <h2>Master List of Memberships</h2>
+                <p>Display the list of all memberships here.</p>
+            `;
+        });
+
+        document.getElementById('activeIssues').addEventListener('click', function() {
+            document.getElementById('contentArea').innerHTML = `
+                <h2>Active Issues</h2>
+                <p>Display the list of active issues here.</p>
+            `;
+        });
+
+        document.getElementById('overdueReturns').addEventListener('click', function() {
+            document.getElementById('contentArea').innerHTML = `
+                <h2>Overdue Returns</h2>
+                <p>Display the list of overdue returns here.</p>
+            `;
+        });
+
+        document.getElementById('pendingRequests').addEventListener('click', function() {
+            document.getElementById('contentArea').innerHTML = `
+                <h2>Pending Issue Requests</h2>
+                <p>Display the list of pending issue requests here.</p>
+            `;
+        });
+
+        document.getElementById('backButtonReports').addEventListener('click', function() {
+            document.getElementById('reportsSidebar').style.display = 'none';
+            document.getElementById('contentArea').innerHTML = `
+                <h2>Welcome to the User Dashboard</h2>
+                <p>Select an option from the top navigation to get started.</p>
+            `;
+        });
+    </script>
+</body>
+</html>
